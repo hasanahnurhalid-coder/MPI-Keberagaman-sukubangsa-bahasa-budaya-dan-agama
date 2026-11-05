@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif (MPI)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- KONFIGURASI URL GOOGLE APPS SCRIPT -->
+    <script>
+        // =========================================================================
+        // MASUKKAN URL DEPLOYMENT WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+        // =========================================================================
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwkKL7P0gu9VVJiXT0ie5jBVjKpcfntVdLxn-12LJA0sjjHPxN8zFuSH8PGQzHUKuET2A/exec";
+        // =========================================================================
+    </script>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="p-2 bg-indigo-600 text-white rounded-xl shadow-md shadow-indigo-200">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 text-lg leading-tight">MPI Pintar</h1>
+                    <p class="text-xs text-slate-500 font-medium">Media Pembelajaran Interaktif</p>
+                </div>
+            </div>
+
+            <!-- User Info Summary -->
+            <div id="user-pill" class="hidden items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700">
+                <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
+                <span id="pill-student-name">Siswa</span>
+                <span class="text-slate-300">|</span>
+                <span id="pill-student-class" class="text-indigo-600">Kelas</span>
+            </div>
+
+            <nav class="flex items-center gap-1 md:gap-2">
+                <button onclick="switchTab('home')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" data-target="home">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Beranda</span>
+                </button>
+                <button onclick="switchTab('materi')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" data-target="materi">
+                    <i data-lucide="book" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Materi</span>
+                </button>
+                <button onclick="startActivity('berlatih')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" data-target="berlatih">
+                    <i data-lucide="pen-tool" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Berlatih</span>
+                </button>
+                <button onclick="startActivity('bermain')" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition" data-target="bermain">
+                    <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Bermain</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- 1. BERANDA VIEW -->
+        <section id="view-home" class="tab-view space-y-8">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="relative z-10 max-w-xl">
+                    <span class="bg-indigo-500/40 text-indigo-100 text-xs font-bold px-3 py-1 rounded-full border border-indigo-400/30">Selamat Datang 👋</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mt-3 leading-tight">Belajar Lebih Seru, Interaktif, dan Menyenangkan!</h2>
+                    <p class="text-indigo-100 mt-2 text-sm sm:text-base">Pahami materi pembelajaran, uji pemahaman melalui latihan, dan selesaikan kuis interaktif.</p>
+                </div>
+            </div>
+
+            <!-- Form Identitas Siswa -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-5 h-5 text-indigo-600"></i> Identitas Siswa
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Nama Lengkap</label>
+                        <input type="text" id="input-student-name" placeholder="Masukkan nama siswa..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Kelas / Rombel</label>
+                        <input type="text" id="input-student-class" placeholder="Contoh: VII-A / 8B" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
+                    </div>
+                </div>
+                <button onclick="saveStudentIdentity()" class="mt-4 w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition shadow-md shadow-indigo-200">
+                    Simpan Identitas
+                </button>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="switchTab('materi')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Menu Materi</h4>
+                    <p class="text-xs text-slate-500">Pelajari topik pembelajaran secara lengkap dan rinci.</p>
+                </div>
+                <div onclick="startActivity('berlatih')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i data-lucide="pen-tool" class="w-6 h-6"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Menu Berlatih</h4>
+                    <p class="text-xs text-slate-500">Latihan mandiri dengan umpan balik jawaban langsung.</p>
+                </div>
+                <div onclick="startActivity('bermain')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                        <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">Menu Bermain</h4>
+                    <p class="text-xs text-slate-500">Kuis berbasis evaluasi interaktif tercatat otomatis.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. MATERI VIEW -->
+        <section id="view-materi" class="tab-view hidden space-y-6">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">Topik Utama</span>
+                <h2 class="text-2xl font-bold text-slate-900">Pengenalan Ekosistem dan Rantai Makanan</h2>
+                <div class="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed space-y-3">
+                    <p>Ekosistem adalah hubungan timbal balik antara makhluk hidup dengan lingkungannya. Dalam suatu ekosistem terdapat komponen biotik (makhluk hidup) dan abiotik (benda tak hidup).</p>
+                    <h4 class="font-bold text-slate-800 text-base mt-4">1. Produsen</h4>
+                    <p>Organisme yang mampu membuat makanannya sendiri melalui proses fotosintesis, seperti tumbuhan hijau dan alga.</p>
+                    <h4 class="font-bold text-slate-800 text-base mt-4">2. Konsumen</h4>
+                    <p>Organisme yang memperoleh energi dengan memakan organisme lain. Terdiri dari Konsumen I (Herbivora), Konsumen II (Karnivora/Omnivora), dan seterusnya.</p>
+                    <h4 class="font-bold text-slate-800 text-base mt-4">3. Pengurai (Dekomposer)</h4>
+                    <p>Organisme pengurai zat organik dari makhluk hidup yang telah mati, seperti bakteri dan jamur.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SOAL / QUIZ VIEW (Satu layar untuk Berlatih & Bermain) -->
+        <section id="view-quiz" class="tab-view hidden space-y-6">
+            <!-- Quiz Bar Header -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <span id="quiz-badge" class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Mode Berlatih</span>
+                    <h3 id="quiz-title" class="font-bold text-slate-900 text-sm sm:text-base mt-1">Soal Kuis Interaktif</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-bold block">PROGRESS</span>
+                    <span id="quiz-progress" class="font-extrabold text-indigo-600 text-base sm:text-lg">1 / 5</span>
+                </div>
+            </div>
+
+            <!-- Quiz Card -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+                <p id="quiz-question" class="text-base sm:text-lg font-semibold text-slate-800 leading-snug">
+                    Memuat pertanyaan...
+                </p>
+
+                <!-- Choices Container -->
+                <div id="quiz-options" class="space-y-3">
+                    <!-- Option items generated via JS -->
+                </div>
+
+                <!-- Immediate Feedback for Mode Berlatih -->
+                <div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm font-medium"></div>
+
+                <!-- Footer Navigation -->
+                <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Kembali
+                    </button>
+                    <button id="btn-next" onclick="nextQuestion()" class="px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200">
+                        Selanjutnya
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. RESULT VIEW -->
+        <section id="view-result" class="tab-view hidden space-y-6">
+            <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl text-center max-w-lg mx-auto space-y-6">
+                <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                    <i data-lucide="trophy" class="w-10 h-10"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-extrabold text-slate-900">Selesai!</h3>
+                    <p class="text-slate-500 text-sm mt-1">Hasil evaluasi belajar kamu telah dicatat.</p>
+                </div>
+
+                <!-- Score Board -->
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-emerald-800">
+                        <span class="block text-xs font-bold uppercase text-emerald-600">Benar</span>
+                        <span id="res-correct" class="text-2xl font-black">0</span>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl text-rose-800">
+                        <span class="block text-xs font-bold uppercase text-rose-600">Salah</span>
+                        <span id="res-wrong" class="text-2xl font-black">0</span>
+                    </div>
+                </div>
+
+                <!-- GAS Sync Status Indicator -->
+                <div id="sync-status" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                    <span id="sync-text">Menghubungkan & Menyimpan hasil ke Google Sheets...</span>
+                </div>
+
+                <div class="flex gap-3 justify-center">
+                    <button onclick="switchTab('home')" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-200 transition">
+                        Ke Beranda
+                    </button>
+                    <button id="btn-restart" onclick="restartActivity()" class="px-5 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition shadow-md shadow-indigo-200">
+                        Coba Lagi
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-400">
+            &copy; 2026 Media Pembelajaran Interaktif (MPI). Integrated with Google Apps Script.
+        </div>
+    </footer>
+
+    <!-- LOGIK KODE JAVASCRIPT -->
+    <script>
+        // Data Soal Default
+        const defaultQuestions = [
+            {
+                id: "Q1",
+                question: "Makhluk hidup yang berperan sebagai pembuat makanan sendiri (autotrof) dalam suatu ekosistem disebut...",
+                options: ["Konsumen I", "Produsen", "Pengurai", "Karnivora"],
+                answer: 1
+            },
+            {
+                id: "Q2",
+                question: "Hewan yang memakan tumbuhan secara langsung dikelompokkan ke dalam kategori...",
+                options: ["Konsumen I (Herbivora)", "Konsumen II (Karnivora)", "Produsen", "Dekomposer"],
+                answer: 0
+            },
+            {
+                id: "Q3",
+                question: "Manakah organisme di bawah ini yang bertindak sebagai dekomposer (pengurai)?",
+                options: ["Rumput", "Kelinci", "Bakteri dan Jamur", "Elang"],
+                answer: 2
+            },
+            {
+                id: "Q4",
+                question: "Komponen ekosistem berupa benda mati seperti air, tanah, udara, dan cahaya matahari disebut komponen...",
+                options: ["Biotik", "Abiotik", "Biosfer", "Simbiosis"],
+                answer: 1
+            },
+            {
+                id: "Q5",
+                question: "Urutan rantai makanan sederhana yang benar di bawah ini adalah...",
+                options: [
+                    "Padi -> Ular -> Tikus -> Elang",
+                    "Padi -> Tikus -> Ular -> Elang",
+                    "Elang -> Ular -> Tikus -> Padi",
+                    "Tikus -> Padi -> Elang -> Ular"
+                ],
+                answer: 1
+            }
+        ];
+
+        // Global State App
+        let currentMode = 'berlatih'; // 'berlatih' | 'bermain'
+        let currentIndex = 0;
+        let userAnswers = {}; // { 0: optionIndex, 1: optionIndex }
+        let studentData = {
+            name: localStorage.getItem('mpi_student_name') || '',
+            class: localStorage.getItem('mpi_student_class') || ''
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadStudentIdentity();
+            syncQuestionsToGAS();
+        });
+
+        // Sync Data Soal ke Google Sheets saat awal load aplikasi
+        function syncQuestionsToGAS() {
+            if (!GAS_URL || GAS_URL.includes("URL_GAS_ANDA_DISINI")) return;
+
+            const payload = {
+                action: "saveQuestions",
+                questions: defaultQuestions
+            };
+
+            fetch(GAS_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log("Init sync logged:", err));
+        }
+
+        // Student Identity Handler
+        function loadStudentIdentity() {
+            if (studentData.name) {
+                document.getElementById('input-student-name').value = studentData.name;
+                document.getElementById('pill-student-name').textContent = studentData.name;
+            }
+            if (studentData.class) {
+                document.getElementById('input-student-class').value = studentData.class;
+                document.getElementById('pill-student-class').textContent = studentData.class;
+            }
+            if (studentData.name && studentData.class) {
+                document.getElementById('user-pill').classList.remove('hidden');
+                document.getElementById('user-pill').classList.add('flex');
+            }
+        }
+
+        function saveStudentIdentity() {
+            const name = document.getElementById('input-student-name').value.trim();
+            const cls = document.getElementById('input-student-class').value.trim();
+
+            if (!name || !cls) {
+                alert('Silakan isi Nama dan Kelas terlebih dahulu!');
+                return;
+            }
+
+            studentData.name = name;
+            studentData.class = cls;
+            localStorage.setItem('mpi_student_name', name);
+            localStorage.setItem('mpi_student_class', cls);
+
+            loadStudentIdentity();
+            alert('Identitas berhasil disimpan!');
+        }
+
+        // Navigation Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            
+            if (tabId === 'home') document.getElementById('view-home').classList.remove('hidden');
+            else if (tabId === 'materi') document.getElementById('view-materi').classList.remove('hidden');
+            else if (tabId === 'quiz') document.getElementById('view-quiz').classList.remove('hidden');
+            else if (tabId === 'result') document.getElementById('view-result').classList.remove('hidden');
+
+            // Update active nav btn style
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.target === tabId) {
+                    btn.classList.add('bg-indigo-50', 'text-indigo-600');
+                } else {
+                    btn.classList.remove('bg-indigo-50', 'text-indigo-600');
+                }
+            });
+        }
+
+        // Start Quiz or Practice Activity
+        function startActivity(mode) {
+            if (!studentData.name || !studentData.class) {
+                switchTab('home');
+                alert('Harap isi Identitas Siswa terlebih dahulu sebelum memulai latihan/kuis!');
+                return;
+            }
+
+            currentMode = mode;
+            currentIndex = 0;
+            userAnswers = {};
+
+            // Setup Badge UI
+            const badge = document.getElementById('quiz-badge');
+            if (mode === 'berlatih') {
+                badge.textContent = 'Mode Berlatih (Latihan Mandiri)';
+                badge.className = 'px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider';
+            } else {
+                badge.textContent = 'Mode Bermain (Evaluasi / Kuis)';
+                badge.className = 'px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full uppercase tracking-wider';
+            }
+
+            renderQuestion();
+            switchTab('quiz');
+        }
+
+        // Render Current Question Card
+        function renderQuestion() {
+            const q = defaultQuestions[currentIndex];
+            document.getElementById('quiz-progress').textContent = `${currentIndex + 1} / ${defaultQuestions.length}`;
+            document.getElementById('quiz-question').textContent = `${currentIndex + 1}. ${q.question}`;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            const feedbackEl = document.getElementById('quiz-feedback');
+            feedbackEl.classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-4 rounded-xl border text-sm font-medium transition flex items-center justify-between `;
+                
+                const isSelected = userAnswers[currentIndex] === idx;
+
+                if (isSelected) {
+                    btn.classList.add('border-indigo-600', 'bg-indigo-50', 'text-indigo-900', 'font-semibold');
+                } else {
+                    btn.classList.add('border-slate-200', 'bg-white', 'hover:border-slate-300', 'text-slate-700');
+                }
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg font-bold flex items-center justify-center text-xs ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>${opt}</span>
+                    </div>
+                `;
+
+                btn.onclick = () => selectOption(idx);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Handle Immediate Feedback for "Berlatih" Mode
+            if (currentMode === 'berlatih' && userAnswers[currentIndex] !== undefined) {
+                const isCorrect = userAnswers[currentIndex] === q.answer;
+                feedbackEl.classList.remove('hidden');
+                if (isCorrect) {
+                    feedbackEl.className = 'p-4 rounded-xl text-sm font-medium bg-emerald-100 text-emerald-800 border border-emerald-200';
+                    feedbackEl.textContent = 'Jawaban kamu Benar!';
+                } else {
+                    feedbackEl.className = 'p-4 rounded-xl text-sm font-medium bg-rose-100 text-rose-800 border border-rose-200';
+                    feedbackEl.textContent = `Jawaban kurang tepat. Jawaban yang benar adalah: (${String.fromCharCode(65 + q.answer)}) ${q.options[q.answer]}`;
+                }
+            }
+
+            // Controls
+            document.getElementById('btn-prev').disabled = currentIndex === 0;
+            document.getElementById('btn-next').textContent = (currentIndex === defaultQuestions.length - 1) ? 'Selesai' : 'Selanjutnya';
+        }
+
+        // Option Selection Handler
+        function selectOption(index) {
+            userAnswers[currentIndex] = index;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < defaultQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Calculate and Finish Quiz
+        function finishQuiz() {
+            let correctCount = 0;
+            let wrongCount = 0;
+            let detailAnswers = [];
+
+            defaultQuestions.forEach((q, idx) => {
+                const userAnsIdx = userAnswers[idx];
+                const isCorrect = userAnsIdx === q.answer;
+
+                if (isCorrect) correctCount++;
+                else wrongCount++;
+
+                const selectedText = userAnsIdx !== undefined ? q.options[userAnsIdx] : 'Tidak Dijawab';
+                detailAnswers.push(`[Soal ${idx+1}: ${isCorrect ? 'BENAR' : 'SALAH'} - Jwb: ${selectedText}]`);
+            });
+
+            document.getElementById('res-correct').textContent = correctCount;
+            document.getElementById('res-wrong').textContent = wrongCount;
+
+            switchTab('result');
+
+            if (correctCount >= 3) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+
+            // Send Result Payload to Google Apps Script (GAS)
+            sendDataToGAS(correctCount, wrongCount, detailAnswers.join(" | "));
+        }
+
+        function restartActivity() {
+            startActivity(currentMode);
+        }
+
+        // Function Kirim Data ke Google Apps Script (GAS)
+        function sendDataToGAS(correct, wrong, details) {
+            const syncStatus = document.getElementById('sync-status');
+            const syncText = document.getElementById('sync-text');
+
+            if (!GAS_URL || GAS_URL.includes("URL_GAS_ANDA_DISINI")) {
+                syncStatus.className = "p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center justify-center gap-2";
+                syncText.textContent = "URL Web App Apps Script belum dikonfigurasi di file HTML (const GAS_URL).";
+                return;
+            }
+
+            syncStatus.className = "p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center justify-center gap-2";
+            syncText.textContent = "Menyimpan hasil ke Google Sheets...";
+
+            const payload = {
+                action: "saveResult",
+                studentName: studentData.name,
+                studentClass: studentData.class,
+                correct: correct,
+                wrong: wrong,
+                details: details
+            };
+
+            // Mengirim via POST dengan payload JSON
+            fetch(GAS_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                syncStatus.className = "p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center justify-center gap-2";
+                syncText.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Data hasil pengerjaan berhasil tersimpan ke Google Sheets!';
+                lucide.createIcons();
+            })
+            .catch(err => {
+                console.error(err);
+                syncStatus.className = "p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center justify-center gap-2";
+                syncText.textContent = "Gagal terhubung ke Google Sheets.";
+            });
+        }
+    </script>
+</body>
+</html>
